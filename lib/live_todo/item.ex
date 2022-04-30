@@ -1,6 +1,7 @@
 defmodule LiveTodo.Item do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query, only: [from: 2]
   alias LiveTodo.Repo
   alias __MODULE__
 
@@ -65,7 +66,8 @@ defmodule LiveTodo.Item do
 
   """
   def list_items do
-    Repo.all(Item)
+    # Repo.all(Item)
+    Repo.all(from item in Item, where: item.status < 2)
   end
 
   @doc """
@@ -83,6 +85,12 @@ defmodule LiveTodo.Item do
   def update_item(%Item{} = item, attrs) do
     item
     |> Item.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_item(id) do
+    get_item!(id)
+    |> Item.changeset(%{status: 2})
     |> Repo.update()
   end
 end
